@@ -1,0 +1,11 @@
+.custom-ribbon {
+  position: absolute;
+  pointer-events: none;
+  width: 70px; /* Diameter of the circle */
+  height: 70px; /* Diameter of the circle */
+  border-radius: 50%; /* Makes the shape circular */
+  background-color: rgba(128, 0, 128, 0.1); /* Transparent purple color */
+  transform: translate(-50%, -50%); /* Center the circle around the pointer */
+  border: 2px solid purple; /* Change border properties as needed */
+  z-index: 10000;
+}
