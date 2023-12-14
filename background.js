@@ -36,9 +36,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 
       const viewTabUrl = chrome.runtime.getURL('screenshot.html');
 
-      // chrome.tabs.create({ url: viewTabUrl }, function (tab) {
+      chrome.tabs.create({ url: viewTabUrl }, function (tab) {
         
-      // });
+      });
     });
   }
 });
