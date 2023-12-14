@@ -7,7 +7,7 @@ document.getElementById('openNewTab').addEventListener('click', function() {
     chrome.scripting
     .executeScript({
       target : {tabId : tab.id, allFrames : true},
-      files : [ "content.js" ],
+      files : [ "./scripts/content.js" ],
     })
     .then(() => console.log("script injected in all frames"));
   });
