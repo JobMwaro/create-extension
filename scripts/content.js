@@ -32,31 +32,52 @@ if (!document.querySelector('.custom-ribbon')) {
   button.style.color = '#000'; // Text color
   document.body.appendChild(button);
 
-  var srcUrl;
   // Create a port and store it in a variable
   function handleClick(event){
-    let port = chrome.runtime.connect({name: "8080"});
-    // Send a message through the port
-    port.postMessage({action: "getActiveTab"});
-    console.log("Message sent")
-    // Listen for messages from the port
-    port.onMessage.addListener(function(message) {
-      // Handle the response here
-      console.log("Received response:", message.success);
+    // Get the element that was clicked
+    // var element = event.target;
+    // // Get the element's type and value
+    // var type = element.tagName;
+    // var value = element.value || element.textContent;
+    // // Log the results to the console
+    // console.log("The element type is " + type);
+    // console.log("The element value is " + value);
+    if(event.target == button){
+      console.log("You clicked the create button")
+      let port = chrome.runtime.connect({name: "8081"});
+      // Send a message through the port
+      port.postMessage({action: "getActiveTab"});
+      // Listen for messages from the port
+      port.onMessage.addListener(function(message) {
+        // Handle the response here
+        console.log("Received response:", message.success);
 
-      chrome.storage.local.get(null, function (result) {
-         // Use the result object to access the data
-        var allKeys = Object.keys(result);
-        console.log('The keys are ' + allKeys.join(', '));
-
-        // Loop through the keys and get the values
-        for (var key of allKeys) {
-          var value = result[key];
-          console.log('The value of ' + key + ' is ' + value);
-        }
       });
+    }
+    else{
+      let port = chrome.runtime.connect({name: "8080"});
+      // Send a message through the port
+      port.postMessage({action: "getActiveTab"});
+      console.log("Message sent")
+      // Listen for messages from the port
+      port.onMessage.addListener(function(message) {
+        // Handle the response here
+        console.log("Received response:", message.success);
 
-    });
+        chrome.storage.local.get(null, function (result) {
+          // Use the result object to access the data
+          var allKeys = Object.keys(result);
+          console.log('The keys are ' + allKeys.join(', '));
+
+          // Loop through the keys and get the values
+          for (var key of allKeys) {
+            var value = result[key];
+            console.log('The value of ' + key + ' is ' + value);
+          }
+        });
+
+      });
+    }
   }
 
   // Add event listener to detect clicks on the document
