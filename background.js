@@ -33,12 +33,17 @@ chrome.runtime.onConnect.addListener(function(port) {
         port.postMessage({ success: true });
         stepCounter = stepCounter + 1;
       });
-
+    });
+  }
+  else if(port.name === "8081"){
+    port.onMessage.addListener(async function(message) {
       const viewTabUrl = chrome.runtime.getURL('screenshot.html');
 
       chrome.tabs.create({ url: viewTabUrl }, function (tab) {
         
       });
-    });
+      port.postMessage({ success: true });
+
+    })
   }
 });
