@@ -26,9 +26,16 @@
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
-        "js": ["scripts/content.js"],
+        "js": ["scripts/jspdf.js","scripts/content.js"],
         "css": ["styles.css"]
       }
+    ],
+    "web_accessible_resources": [
+      {
+        "matches": ["<all_urls>"],
+        "resources": ["scripts/jspdf.js","icons/stop-button.png","icons/check-mark.png"]
+      }
     ]
+
   }
   

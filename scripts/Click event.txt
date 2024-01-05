@@ -1,0 +1,9 @@
+Click event
+Elements: SPAN,DIV,BUTTON,IMG,I,A,TD,TH,HEADER,B,P,STRONG,SMALL,H1,H2,H3,H4,H5,H6,   
+Message: Click [value].
+
+Elements: SELECT
+Message: Click and select option from the dropdown.
+
+Elements: INPUT
+Message: Enter [value].
