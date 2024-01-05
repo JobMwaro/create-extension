@@ -53,6 +53,7 @@ function getSrl(){
       if (target.classList.contains("stepDescription")) {
         let input = document.createElement("input");
         input.value = target.textContent;
+        input.id = target.id;
         input.type = "text";
         input.className = "stepDescriptionEdit";
         target.replaceWith(input);
@@ -65,7 +66,7 @@ function getSrl(){
             let value = input.value;
             let newText = document.createElement("span");
             newText.textContent = value;
-            newText.id = "text";
+            newText.id = input.id;
             newText.className = "stepDescription";
             input.replaceWith(newText);
           }
