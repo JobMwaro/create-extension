@@ -153,10 +153,6 @@ if (!document.querySelector('.custom-ribbon')) {
       (document.head || document.documentElement).appendChild(scriptElement);
       console.log("script element appended")
         console.log("script loaded")
-        // var doc = new window.jsPDF(); // Access jsPDF from the window object
-        // doc.text('Hello world!', 10, 10);
-        // doc.save('example.pdf');
-      
         //get images from storage
         chrome.storage.local.get(null, function (result) {
           // Use the result object to access the data
@@ -167,12 +163,37 @@ if (!document.querySelector('.custom-ribbon')) {
             return parseInt(a.slice(4)) - parseInt(b.slice(4));
           });
           
-          var doc = new window.jspdf.jsPDF(); // Access jsPDF from the window object
+          var doc = new window.jspdf.jsPDF('p', 'mm', 'a4'); // Access jsPDF from the window object
           var imagesLoaded = 0; // Counter to track loaded images
           var imagesAdded = 0;
 
-          // Add text to the PDF
-          doc.text('Hello world!', 10, 10);
+          
+          // Get page dimensions
+          var pageSize = doc.internal.pageSize;
+          var pageWidth = pageSize.getWidth();
+          var headingText = 'New company registration - Step by step guide. Wrap this text';
+          var fontSize = 25;
+          doc.setFontSize(fontSize);
+          doc.setFont('helvetica', 'normal');
+          // Get text width
+          var headingTextWidth = doc.getTextDimensions(headingText).w;
+          // Calculate center position for horizontal alignment
+          var headingTextX = (pageWidth - headingTextWidth) / 2;
+          let lineWidth = 45; // Adjust as needed
+          let lines = headingText.split(/\s+/).reduce((lines, word) => {
+            if (lines[lines.length - 1].length + word.length > lineWidth) {
+                lines.push("");
+            }
+            lines[lines.length - 1] += word + " ";
+            return lines;
+          }, [""]);
+          let y = 20;
+          lines.forEach(line => {
+              let textWidth = doc.getTextDimensions(line).w // Calculate text width
+              let x = (pageWidth - textWidth) / 2; // Center horizontally
+              doc.text(line, x, y);
+              y += 10; // Adjust spacing as needed
+          });
 
           function addImageToPDF(value, key){
             // Create an Image object to get the actual image dimensions
@@ -181,15 +202,55 @@ if (!document.querySelector('.custom-ribbon')) {
               var imgWidth = 170; // Width of the image in the PDF
               var imgHeight = (img.height * imgWidth) / img.width; // Maintain aspect ratio
 
-              var availableSpace = doc.internal.pageSize.height - (30 + imagesAdded * 100 + imgHeight); // Calculate available space
+              var availableSpace = doc.internal.pageSize.height - (30 + imagesAdded * 122 + imgHeight); // Calculate available space
 
               if (availableSpace < 0 && imagesAdded > 0) {
                 doc.addPage(); // Move to a new page
                 imagesAdded = 0; // Reset image counter for new page
               }
 
-              // Add the base64-encoded image to the PDF
-              doc.addImage(value, 'PNG', 10, 30 + imagesAdded * 100, imgWidth, imgHeight);
+              // Add the image to the PDF
+              var imgX = (pageWidth - imgWidth) / 2;
+              doc.addImage(value, 'PNG', imgX, 32 + imagesAdded * 122, imgWidth, imgHeight);
+              //Add step
+              stepNumberText = 'Step #'+parseInt(key.slice(4));
+              // Set font size and type
+              var fontSize = 16;
+              doc.setFontSize(fontSize);
+              doc.setFont('helvetica', 'normal');
+
+              // Get text width
+              var textWidth = doc.getTextDimensions(stepNumberText).w;
+
+              // Calculate center position for horizontal alignment
+              var textX = (pageWidth - textWidth) / 2;
+              doc.setTextColor("#8A2BE2");
+              doc.text(stepNumberText,textX, 128 + imagesAdded * 122);
+
+              var stepDescriptionText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tempor id turpis in porttitor. Vivamus ex felis, efficitur in sodales sit amet, dapibus efficitur ante. Aliquam eu pretium nibh, ut elementum purus. Sed dignissim dui a varius pretium. In sit amet eleifend dui, non consequat ante.";
+              // Set font size and type
+              var fontSize = 12;
+              doc.setFontSize(fontSize);
+              doc.setFont('helvetica', 'normal');
+              doc.setTextColor("#000000");
+              const lineWidth = 90; // Adjust as needed
+              const lines = stepDescriptionText.split(/\s+/).reduce((lines, word) => {
+                if (lines[lines.length - 1].length + word.length > lineWidth) {
+                    lines.push("");
+                }
+                lines[lines.length - 1] += word + " ";
+                return lines;
+              }, [""]);
+              let y = 134 + imagesAdded * 122; // Initial y-coordinate
+              const pageWidth1 = doc.internal.pageSize.getWidth(); // Get actual page width
+              lines.forEach(line => {
+                  const textWidth = doc.getTextDimensions(line).w // Calculate text width
+                  const x = (pageWidth1 - textWidth) / 2; // Center horizontally
+                  doc.text(line, x, y);
+                  y += 5; // Adjust spacing as needed
+              });
+
+
 
               imagesLoaded++;
               imagesAdded++;
@@ -201,7 +262,7 @@ if (!document.querySelector('.custom-ribbon')) {
               // Check if all images are loaded and then save the PDF
               if(imagesLoaded === allKeys.length){
                 // Save the PDF
-                doc.save('example_with_image.pdf');
+                doc.save('create_user_guide.pdf');
               }
             };
             img.src = value; // Set the source of the image object
