@@ -15,6 +15,12 @@
       color: blueviolet;
       line-height: 0.5;
     }
+    #userGuideTitleContent {
+      color: '#0000';
+      line-height: 1.0;
+      text-align: center;
+      
+    }
     .stepContainer {
       width: 55%;
       height: 500px;
@@ -24,6 +30,22 @@
       text-align: center;
       margin: 0 auto;
       overflow: hidden;
+    }
+    .userGuideTitle {
+      width: 55%;
+      height: 100px;
+      border: 1px solid #cccccc;
+      border-radius: 10px;
+      box-shadow: 2px 2px 5px #cccccc;
+      text-align: center;
+      margin: 0 auto;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      padding: auto;
     }
     .stepContainerAfter {
       content: "";
@@ -70,9 +92,12 @@
       display: block;
     }
     .stepDescriptionEdit {
+      resize: vertical;
       width: 100%;
-      height: 25%;
+      max-height: 50%;
       border-radius: 5px;
+      font-family: Helvetica, sans-serif;
+      font-size: 15px;
       border: 1px solid #cccccc;
     }
 
