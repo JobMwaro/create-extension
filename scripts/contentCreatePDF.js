@@ -29,12 +29,15 @@
     var doc = new window.jspdf.jsPDF('p', 'mm', 'a4'); // Access jsPDF from the window object
     var imagesLoaded = 0; // Counter to track loaded images
     var imagesAdded = 0;
+    var autoAdjustImg = 0;
 
     
     // Get page dimensions
     var pageSize = doc.internal.pageSize;
     var pageWidth = pageSize.getWidth();
-    var headingText = 'New company registration - Step by step guide. Wrap this text';
+    let userGuideTitleContentIdGetter = document.getElementById('userGuideTitleContent');
+    let userGuideTitleContentValue = userGuideTitleContentIdGetter.innerHTML;
+    let headingText = userGuideTitleContentValue;
     var fontSize = 25;
     doc.setFontSize(fontSize);
     doc.setFont('helvetica', 'normal');
@@ -42,7 +45,7 @@
     var headingTextWidth = doc.getTextDimensions(headingText).w;
     // Calculate center position for horizontal alignment
     var headingTextX = (pageWidth - headingTextWidth) / 2;
-    let lineWidth = 45; // Adjust as needed
+    let lineWidth = 40; 
     let lines = headingText.split(/\s+/).reduce((lines, word) => {
       if (lines[lines.length - 1].length + word.length > lineWidth) {
           lines.push("");
@@ -55,7 +58,7 @@
         let textWidth = doc.getTextDimensions(line).w // Calculate text width
         let x = (pageWidth - textWidth) / 2; // Center horizontally
         doc.text(line, x, y);
-        y += 10; // Adjust spacing as needed
+        y += 10; 
     });
 
     function addImageToPDF(value, key){
@@ -66,7 +69,7 @@
         var imgHeight = (img.height * imgWidth) / img.width; // Maintain aspect ratio
 
         var availableSpace = doc.internal.pageSize.height - (30 + imagesAdded * 122 + imgHeight); // Calculate available space
-
+        
         if (availableSpace < 0 && imagesAdded > 0) {
           doc.addPage(); // Move to a new page
           imagesAdded = 0; // Reset image counter for new page
@@ -74,13 +77,20 @@
 
         // Add the image to the PDF
         var imgX = (pageWidth - imgWidth) / 2;
-        doc.addImage(value, 'PNG', imgX, 34 + imagesAdded * 122, imgWidth, imgHeight);
+        if(autoAdjustImg === 0){
+          doc.addImage(value, 'PNG', imgX, 33 + imagesAdded * 122, imgWidth, imgHeight);
+          console.log('Auto adjust Image position1 '+autoAdjustImg)
+        }else{
+          doc.addImage(value, 'PNG', imgX, autoAdjustImg + 12 + imagesAdded * 122, imgWidth, imgHeight);
+          console.log('Auto adjust Image position '+autoAdjustImg)
+        }
+        
         //Add step
         stepNumberText = 'Step #'+parseInt(key.slice(4));
         // Set font size and type
-        var fontSize = 16;
+        var fontSize = 18;
         doc.setFontSize(fontSize);
-        doc.setFont('helvetica', 'normal');
+        doc.setFont('helvetica', 'bold');
 
         // Get text width
         var textWidth = doc.getTextDimensions(stepNumberText).w;
@@ -88,18 +98,18 @@
         // Calculate center position for horizontal alignment
         var textX = (pageWidth - textWidth) / 2;
         doc.setTextColor("#8A2BE2");
-        doc.text(stepNumberText,textX, 130 + imagesAdded * 122);
+        doc.text(stepNumberText,textX, 129 + imagesAdded * 122);
 
         let stepDescriptionIdSetter = 'stepDescription'+key;
         let stepDescriptionIdGetter = document.getElementById(stepDescriptionIdSetter);
         let stepDescriptionIdValue = stepDescriptionIdGetter.innerHTML;
         let stepDescriptionText = stepDescriptionIdValue;
         // Set font size and type
-        var fontSize = 12;
+        var fontSize = 14;
         doc.setFontSize(fontSize);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor("#000000");
-        const lineWidth = 90; // Adjust as needed
+        const lineWidth = 75; // Adjust as needed
         const lines = stepDescriptionText.split(/\s+/).reduce((lines, word) => {
           if (lines[lines.length - 1].length + word.length > lineWidth) {
               lines.push("");
@@ -107,14 +117,19 @@
           lines[lines.length - 1] += word + " ";
           return lines;
         }, [""]);
-        let y = 136 + imagesAdded * 122; // Initial y-coordinate
+        let y = 137 + imagesAdded * 122; // Initial y-coordinate
         const pageWidth1 = doc.internal.pageSize.getWidth(); // Get actual page width
+        var numberOfLines = 1;
+        var textHeight =1;
         lines.forEach(line => {
             const textWidth = doc.getTextDimensions(line).w // Calculate text width
+            textHeight = doc.getTextDimensions(line).h;
             const x = (pageWidth1 - textWidth) / 2; // Center horizontally
             doc.text(line, x, y);
-            y += 5; // Adjust spacing as needed
+            y += 6; 
+            numberOfLines += 1;
         });
+        autoAdjustImg = numberOfLines * textHeight;
         imagesLoaded++;
         imagesAdded++;
         // Check if all images are loaded and then save the PDF
