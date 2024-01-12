@@ -12,8 +12,8 @@ if (!document.querySelector('.custom-ribbon')) {
 
   // Function to update ribbon position
   function updateRibbonPosition(event) {
-    customRibbon.style.left = event.clientX + 'px';
-    customRibbon.style.top = event.clientY + 'px';
+    customRibbon.style.left = event.pageX + 'px';
+    customRibbon.style.top = event.pageY + 'px';
   }
 
   // Add event listener to update ribbon position on mousemove
