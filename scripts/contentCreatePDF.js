@@ -7,24 +7,104 @@
  button.style.position = 'fixed';
  button.style.bottom = '75px';
  button.style.right = '40px';
- button.style.padding = '5px';
- button.style.borderRadius = '15px';
- button.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.2)';
- button.style.border = '1px solid #000'; // Border style
- button.style.background = '#fff'; // Background color
- button.style.color = '#000'; // Text color
+//  button.style.padding = '5px';
+//  button.style.borderRadius = '15px';
+//  button.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.2)';
+//  button.style.border = '1px solid #000'; // Border style
+//  button.style.background = '#fff'; // Background color
+//  button.style.color = '#000'; // Text color
  button.style.width = '100px';
- button.style.textAlign = 'center';
- document.body.appendChild(button);
+//  button.style.textAlign = 'center';
+//  document.body.appendChild(button);
+
+ button.style.backgroundImage = 'linear-gradient(#42A1EC, #0070C9)';
+  button.style.border = '1px solid #0077CC';
+  button.style.borderRadius = '4px';
+  button.style.boxSizing = 'border-box';
+  button.style.color = '#FFFFFF';
+  button.style.cursor = 'pointer';
+  button.style.direction = 'ltr';
+  button.style.display = 'block';
+  button.style.fontFamily = '"SF Pro Text", "SF Pro Icons", "AOS Icons", "Helvetica Neue", Helvetica, Arial, sans-serif';
+  button.style.fontSize = '14px';
+  button.style.fontWeight = '400';
+  button.style.height = '29px';
+  button.style.letterSpacing = '-.022em';
+  button.style.lineHeight = '1.47059';
+  button.style.minWidth = '30px';
+  button.style.overflow = 'visible';
+  button.style.padding = '4px 15px';
+  button.style.textAlign = 'center';
+  button.style.userSelect = 'none';
+  button.style.webkitUserSelect = 'none';
+  button.style.touchAction = 'manipulation';
+  button.style.whiteSpace = 'nowrap';
+  document.body.appendChild(button);
+
+  // Hover state
+  button.addEventListener('mouseover', () => {
+      button.style.backgroundImage = 'linear-gradient(#51A9EE, #147BCD)';
+      button.style.borderColor = '#1482D0';
+      button.style.textDecoration = 'none';
+  });
+
+  // Active state
+  button.addEventListener('mousedown', () => {
+      button.style.backgroundImage = 'linear-gradient(#3D94D9, #0067B9)';
+      button.style.borderColor = '#006DBC';
+      button.style.outline = 'none';
+  });
+
+  // Focus state
+  button.addEventListener('focus', () => {
+      button.style.boxShadow = 'rgba(131, 192, 253, 0.5) 0 0 0 3px';
+      button.style.outline = 'none';
+  });
+
+  // Blur state
+  button.addEventListener('blur', () => {
+      button.style.boxShadow = '';
+  });
 
  button.addEventListener('click', function(){
   console.log("Button Clicked")
   chrome.storage.local.get(null, function(result) {
     var allKeys = Object.keys(result);
 
-    allKeys.sort(function(a, b) {
+    function separateElements(data) {
+      const elementTypes = [];
+      const elementValues = [];
+      const steps = [];
+    
+      for (const item of data) {
+        if (item.startsWith("elementType")) {
+          elementTypes.push(item);
+        } else if (item.startsWith("elementValue")) {
+          elementValues.push(item);
+        } else {
+          steps.push(item);
+        }
+      }
+    
+      return {
+        elementTypes,
+        elementValues,
+        steps,
+      };
+    }
+    
+    const separated = separateElements(allKeys);
+    // console.log(separated.elementTypes); // Output: ["elementType1", "elementType10", ...]
+    // console.log(separated.elementValues); // Output: ["elementValue1", "elementValue10", ...]
+    // console.log(separated.steps);          // Output: ["step1", "step2", ...]
+
+    separated.steps.sort(function(a, b) {
       return parseInt(a.slice(4)) - parseInt(b.slice(4));
     });
+
+    // allKeys.sort(function(a, b) {
+    //   return parseInt(a.slice(4)) - parseInt(b.slice(4));
+    // });
 
     var doc = new window.jspdf.jsPDF('p', 'mm', 'a4'); // Access jsPDF from the window object
     var imagesLoaded = 0; // Counter to track loaded images
@@ -80,8 +160,13 @@
         if(autoAdjustImg === 0){
           doc.addImage(value, 'PNG', imgX, 33 + imagesAdded * 122, imgWidth, imgHeight);
           console.log('Auto adjust Image position1 '+autoAdjustImg)
-        }else{
-          doc.addImage(value, 'PNG', imgX, autoAdjustImg + 12 + imagesAdded * 122, imgWidth, imgHeight);
+        }
+        else if(autoAdjustImg !== 0 && imagesAdded === 0){
+          doc.addImage(value, 'PNG', imgX, 33 + imagesAdded * 122, imgWidth, imgHeight);
+          console.log('Auto adjust Image position1 '+autoAdjustImg)
+        }
+        else{
+          doc.addImage(value, 'PNG', imgX, autoAdjustImg + 11 + imagesAdded * 122, imgWidth, imgHeight);
           console.log('Auto adjust Image position '+autoAdjustImg)
         }
         
@@ -98,7 +183,18 @@
         // Calculate center position for horizontal alignment
         var textX = (pageWidth - textWidth) / 2;
         doc.setTextColor("#8A2BE2");
-        doc.text(stepNumberText,textX, 129 + imagesAdded * 122);
+
+        if(autoAdjustImg === 0){
+          doc.text(stepNumberText,textX, 129 + imagesAdded * 122);
+          console.log('First step text');
+        }
+        else if(autoAdjustImg !== 0 && imagesAdded === 0){
+          doc.text(stepNumberText,textX, 129 + imagesAdded * 122);
+        }
+        else{
+          doc.text(stepNumberText,textX, autoAdjustImg + 109 + imagesAdded * 122);
+        }
+        
 
         let stepDescriptionIdSetter = 'stepDescription'+key;
         let stepDescriptionIdGetter = document.getElementById(stepDescriptionIdSetter);
@@ -117,7 +213,18 @@
           lines[lines.length - 1] += word + " ";
           return lines;
         }, [""]);
-        let y = 137 + imagesAdded * 122; // Initial y-coordinate
+        let y = 0;
+        if(autoAdjustImg === 0){
+          y = 137 + imagesAdded * 122;
+        }
+        else if(autoAdjustImg !== 0 && imagesAdded === 0){
+          y = 137 + imagesAdded * 122;
+        }
+        else{
+          y = autoAdjustImg + 117 + imagesAdded * 122;
+          autoAdjustImg = 0;
+        }
+
         const pageWidth1 = doc.internal.pageSize.getWidth(); // Get actual page width
         var numberOfLines = 1;
         var textHeight =1;
@@ -133,7 +240,7 @@
         imagesLoaded++;
         imagesAdded++;
         // Check if all images are loaded and then save the PDF
-        if(imagesLoaded === allKeys.length){
+        if(imagesLoaded === separated.steps.length){
           // Save the PDF
           doc.save('create_user_guide.pdf');
         }
@@ -141,7 +248,7 @@
       img.src = value; // Set the source of the image object
     }
 
-    for (var key of allKeys) {
+    for (var key of separated.steps) {
       var value = result[key];
       console.log('The value is ' + value);
       addImageToPDF(value, key);

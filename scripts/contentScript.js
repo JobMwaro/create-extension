@@ -14,14 +14,43 @@ function getSrl(){
     stepContainerAfter.setAttribute("class", "stepContainerAfter");
     document.body.appendChild(stepContainerAfter);
 
-  chrome.storage.local.get(null, function(result) {
+    chrome.storage.local.get(null, function(result) {
     var allKeys = Object.keys(result);
 
-    allKeys.sort(function(a, b) {
+    function separateElements(data) {
+      const elementTypes = [];
+      const elementValues = [];
+      const steps = [];
+    
+      for (const item of data) {
+        if (item.startsWith("elementType")) {
+          elementTypes.push(item);
+        } else if (item.startsWith("elementValue")) {
+          elementValues.push(item);
+        } else {
+          steps.push(item);
+        }
+      }
+    
+      return {
+        elementTypes,
+        elementValues,
+        steps,
+      };
+    }
+    
+    const separated = separateElements(allKeys);
+    console.log(separated.elementTypes); // Output: ["elementType1", "elementType10", ...]
+    console.log(separated.elementValues); // Output: ["elementValue1", "elementValue10", ...]
+    console.log(separated.steps);          // Output: ["step1", "step2", ...]
+
+    separated.steps.sort(function(a, b) {
       return parseInt(a.slice(4)) - parseInt(b.slice(4));
     });
 
-    for (var key of allKeys) {
+    // console.log(allKeys);
+
+    for (var key of separated.steps) {
       var value = result[key];
       var stepNo = parseInt(key.slice(4));
       var stepContainer = document.createElement('div');
@@ -58,7 +87,43 @@ function getSrl(){
       stepFooterIdGetter.appendChild(stepTitle);
       stepFooterIdGetter.appendChild(stepDescription);
       stepTitle.innerHTML = 'Step #'+stepNo;
-      stepDescription.innerHTML = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tempor id turpis in porttitor. Vivamus ex felis, efficitur in sodales sit amet, dapibus efficitur ante. Aliquam eu pretium nibh.";
+      // stepDescription.innerHTML = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tempor id turpis in porttitor. Vivamus ex felis, efficitur in sodales sit amet, dapibus efficitur ante. Aliquam eu pretium nibh.";
+      
+      for (var key1 of separated.elementTypes) {
+        var elementTypeNo = parseInt(key1.slice(11));
+        if (elementTypeNo===stepNo){
+          var elementType = result[key1];
+          for (var key2 of separated.elementValues) {
+            var elementValueNo = parseInt(key2.slice(12));
+            // stepDescription.innerHTML = elementValueNo+". "+elementType;
+            if (elementValueNo===stepNo){
+              var elementValue = result[key2];
+              stepDescription.innerHTML = elementValueNo+". "+elementType+" "+elementValue;
+              if(elementType === "DIV"){
+                stepDescription.innerHTML = "Click the '" + elementValue.trim() + "' option to access " + elementValue.toLowerCase().trim() + ".";
+              }
+              else if(elementType === "SPAN"){
+                stepDescription.innerHTML = "Click the '" + elementValue.trim() + "' option to " + elementValue.toLowerCase().trim() + ".";
+              }
+              else if(elementType === "INPUT"){
+                stepDescription.innerHTML = "Click the input field to enter the required data.";
+              }
+              else if(elementType === "BUTTON"){
+                stepDescription.innerHTML = "Click the '" + elementValue.trim() + "' button to " + elementValue.toLowerCase().trim() + ".";
+              }
+              else if(elementType === "SELECT"){
+                stepDescription.innerHTML = "Click the dropdown menu, from the dropdown list, select the desired option.";
+              }
+
+            }
+            
+          }
+        }
+        
+      }
+
+      
+    
     }
 
     let parent = document.body;

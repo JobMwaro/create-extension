@@ -9,3 +9,23 @@
   border: 2px solid purple; /* Change border properties as needed */
   z-index: 10000;
 }
+
+/* Add a CSS class for the flash effect */
+.button-container {
+  animation: pulse 1s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

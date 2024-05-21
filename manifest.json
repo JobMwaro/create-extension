@@ -21,7 +21,7 @@
       "default_popup": "popup/popup.html"
     },
     "icons": {
-      "128": "icons/icon128.png"
+      "96": "assets/how-to-logo-icon.png"
     },
     "content_scripts": [
       {
@@ -33,7 +33,7 @@
     "web_accessible_resources": [
       {
         "matches": ["<all_urls>"],
-        "resources": ["scripts/jspdf.js","icons/stop-button.png","icons/check-mark.png"]
+        "resources": ["scripts/jspdf.js","icons/stop-button.png","icons/check-mark.png","assets/shutterSound.mp3","assets/how-to-logo-icon.png"]
       }
     ]
 
