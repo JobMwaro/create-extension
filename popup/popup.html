@@ -1,20 +1,322 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link href='https://fonts.googleapis.com/css?family=Libre Baskerville' rel='stylesheet'>
   <title>Create</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       text-align: center;
       padding: 20px;
     }
+    /* Basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Card styles */
+    .card {
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .card-header {
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background-color: #fff;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .card-header h1 {
+      font-weight: bold;
+    }
+
+    .card-body {
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    /* Tab styles */
+    .tabs {
+      display: flex;
+      list-style: none;
+      background-color: #e7e9ec;
+      border-radius: 4px;
+      padding: 5px;
+      font-weight: bold;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 1px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background-color: white;
+      color: black;
+      border-radius: 4px;
+    }
+
+    .tab.active#firstTabLI img{
+      content: url('/assets/home-48.png');
+    }
+
+    .tab.active#secondTabLI img{
+      content: url('/assets/contact-us-48.png');
+    }
+
+    #firstTabLI
+
+    .overview .active {
+      display: block;
+    }
+
+    .overview:not(.active) {
+      display: none;
+    }
+
+    .comments .active {
+      display: block;
+    }
+
+    .comments:not(.active) {
+      display: none;
+    }
+
+    /* Overview styles */
+    .overview h2 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .overview p {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      background-color: #e0e0e0;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .badge img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .badge span {
+      font-size: 14px;
+      font-weight: bold;
+      color: #007bff;
+    }
+    
+    #openNewTab {
+      background-image: linear-gradient(#42A1EC, #0070C9);
+      border: 1px solid #0077CC;
+      border-radius: 4px;
+      box-sizing: border-box;
+      color: #FFFFFF;
+      cursor: pointer;
+      direction: ltr;
+      display: block;
+      font-family: "SF Pro Text","SF Pro Icons","AOS Icons","Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      height: 29px;
+      letter-spacing: -.022em;
+      line-height: 1.47059;
+      min-width: 30px;
+      overflow: visible;
+      padding: 4px 15px;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      white-space: nowrap;
+      width: 45%;
+      float: left;
+    }
+
+    #openNewTab:disabled {
+      cursor: default;
+      opacity: .3;
+    }
+
+    #openNewTab:hover {
+      background-image: linear-gradient(#51A9EE, #147BCD);
+      border-color: #1482D0;
+      text-decoration: none;
+    }
+
+    #openNewTab:active {
+      background-image: linear-gradient(#3D94D9, #0067B9);
+      border-color: #006DBC;
+      outline: none;
+    }
+
+    #openNewTab:focus {
+      box-shadow: rgba(131, 192, 253, 0.5) 0 0 0 3px;
+      outline: none;
+    }
+
+    .greyButton{
+      background-image: linear-gradient(#f7f8fa ,#e7e9ec);
+      border-color: #adb1b8 #a2a6ac #8d9096;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 3px;
+      box-shadow: rgba(255,255,255,.6) 0 1px 0 inset;
+      box-sizing: border-box;
+      color: #0f1111;
+      cursor: pointer;
+      display: inline-block;
+      font-family: "Amazon Ember",Arial,sans-serif;
+      font-size: 14px;
+      height: 29px;
+      font-size: 13px;
+      outline: 0;
+      overflow: hidden;
+      padding: 0 11px;
+      text-align: center;
+      text-decoration: none;
+      text-overflow: ellipsis;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      white-space: nowrap;
+      width: 45%;
+    }
+
+    .greyButton:active {
+      border-bottom-color: #a2a6ac;
+    }
+
+    .greyButton:active:hover {
+      border-bottom-color: #a2a6ac;
+    }
+
+    .greyButton:hover {
+      border-color: #a2a6ac #979aa1 #82858a;
+    }
+
+    .greyButton:focus {
+      box-shadow: rgba(131, 192, 253, 0.5) 0 0 0 3px;
+      outline: none;
+    }
+
+    .redButton {
+      background-image: linear-gradient(#42A1EC, #0070C9);
+      border: 1px solid #0077CC;
+      border-radius: 4px;
+      box-sizing: border-box;
+      color: #FFFFFF;
+      cursor: pointer;
+      direction: ltr;
+      display: block;
+      font-family: "SF Pro Text","SF Pro Icons","AOS Icons","Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      height: 29px;
+      letter-spacing: -.022em;
+      line-height: 1.47059;
+      min-width: 30px;
+      overflow: visible;
+      padding: 4px 15px;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      white-space: nowrap;
+      width: 45%;
+      float: left;
+    }
+    .redButton:disabled {
+      cursor: default;
+      opacity: .3;
+    }
+
+    .redButton:hover {
+      background-image: linear-gradient(#51A9EE, #147BCD);
+      border-color: #1482D0;
+      text-decoration: none;
+    }
+
+    .redButton:active {
+      background-image: linear-gradient(#3D94D9, #0067B9);
+      border-color: #006DBC;
+      outline: none;
+    }
+
+    .redButton:focus {
+      box-shadow: rgba(131, 192, 253, 0.5) 0 0 0 3px;
+      outline: none;
+    }
+    
+    .firstTabContent3{
+      margin-top: 15px;
+      ;
+    }
+
   </style>
 </head>
 <body>
-  <h1>Create</h1>
+  <!-- <h1>Create</h1>
   <p>Click the button to open a new tab</p>
-  <button id="openNewTab">Open New Tab</button>
-
+  <button id="openNewTab">Open New Tab</button> -->
+  <div class="card">
+    <div class="card-header">
+      <img class="logo" src="/assets/logo.png" width="100%" style="border-radius: 4px;">
+      <!-- <h1>How-to</h1> -->
+    </div>
+    <div class="card-body">
+      <ul class="tabs">
+        <li class="tab active" id="firstTabLI" data-tab="overview">
+            <img src="/assets/home-48-gray.png" width="20%">
+        </li>
+        <li class="tab" id="secondTabLI" data-tab="comments">
+          <img src="/assets/contact-us-48-gray.png" width="20%">
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="overview active">
+          <div class="firstTabContent1">
+            <img src="/assets/light.gif" width="80%">
+          </div>
+          <div class="firstTabContent2">
+            <span>Document your workflows seamlessly with this Chrome extension.</span>
+          </div>
+          <div class="firstTabContent3">
+            <button id="openNewTab">Start</button>
+            <button class="greyButton" id="stop">Stop</button>
+          </div>
+          <!-- <div class="badge">
+            <img src="matthew.jpg" alt="Matthew Johnson">
+            <span>Top-performing employee of August!</span>
+          </div> -->
+        </div>
+        <div class="comments">
+          <h2>Tab 2</h2>
+          <button class="greyButton" id="clearButton">Clear Storage</button>
+          <!-- Comments content goes here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
   <script src="popup.js"></script>
 </body>
 </html>
