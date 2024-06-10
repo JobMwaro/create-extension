@@ -96,23 +96,137 @@ function getSrl(){
           for (var key2 of separated.elementValues) {
             var elementValueNo = parseInt(key2.slice(12));
             // stepDescription.innerHTML = elementValueNo+". "+elementType;
+           
             if (elementValueNo===stepNo){
               var elementValue = result[key2];
               stepDescription.innerHTML = elementValueNo+". "+elementType+" "+elementValue;
               if(elementType === "DIV"){
-                stepDescription.innerHTML = "Click the '" + elementValue.trim() + "' option to access " + elementValue.toLowerCase().trim() + ".";
+                let trimstepDescription = "Click the \"" + elementValue.trim() + "\" option to access " + elementValue.toLowerCase().trim() + ".";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
               }
               else if(elementType === "SPAN"){
-                stepDescription.innerHTML = "Click the '" + elementValue.trim() + "' option to " + elementValue.toLowerCase().trim() + ".";
+                let trimstepDescription = "Click the \"" + elementValue.trim() + "\" option to " + elementValue.toLowerCase().trim() + ".";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
               }
               else if(elementType === "INPUT"){
-                stepDescription.innerHTML = "Click the input field to enter the required data.";
+                let trimstepDescription = "Click the input field to enter the required data.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "TEXTAREA"){
+                let trimstepDescription = "Click the textarea to enter the required data.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
               }
               else if(elementType === "BUTTON"){
-                stepDescription.innerHTML = "Click the '" + elementValue.trim() + "' button to " + elementValue.toLowerCase().trim() + ".";
+                let trimstepDescription = "Click the \"" + elementValue.trim() + "\" button to " + elementValue.toLowerCase().trim() + ".";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
               }
               else if(elementType === "SELECT"){
-                stepDescription.innerHTML = "Click the dropdown menu, from the dropdown list, select the desired option.";
+                let trimstepDescription = "Click the dropdown menu, from the dropdown list, select the desired option.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "A"){
+                let trimstepDescription = "Click the \"" + elementValue.trim() + "\" option to access " + elementValue.toLowerCase().trim() + ".";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "H1"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "H2"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "H3"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "H4"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "H5"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "H6"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "P"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "TR"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
+              }
+              else if(elementType === "TD"){
+                let trimstepDescription = "Click \"" + elementValue.trim() + "\" as shown.";
+                if (trimstepDescription.length > 215) {
+                  trimstepDescription = trimstepDescription.slice(0, 215);
+                  stepDescription.innerHTML = trimstepDescription;
+                }
+                stepDescription.innerHTML = trimstepDescription;
               }
 
             }
