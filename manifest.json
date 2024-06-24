@@ -33,7 +33,13 @@
     "web_accessible_resources": [
       {
         "matches": ["<all_urls>"],
-        "resources": ["scripts/jspdf.js","icons/stop-button.png","icons/check-mark.png","assets/shutterSound.mp3","assets/how-to-logo-icon.png"]
+        "resources": 
+        ["scripts/jspdf.js",
+        "icons/stop-button.png",
+        "icons/check-mark.png",
+        "assets/shutterSound.mp3",
+        "assets/how-to-logo-icon.png",
+      "assets/icons8-warning-48.png"]
       }
     ]
 

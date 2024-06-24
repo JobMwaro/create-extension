@@ -208,84 +208,130 @@ if (!document.querySelector('.custom-ribbon')) {
     //   }
     // }
     else{
-        let port = chrome.runtime.connect({name: "8080"});
-        // Send a message through the port
-        port.postMessage(sendElementAndValue);
-        port.postMessage({action: "getActiveTab"});
-        console.log("Message sent")
-        // Listen for messages from the port
-        port.onMessage.addListener(function(message) {
-          // Handle the response here
-          // console.log("Received response:", message.success);
 
-          chrome.storage.local.get(null, function (result) {
-            // Use the result object to access the data
-            var allKeys = Object.keys(result);
-            // console.log('The keys are ' + allKeys.join(', '));
-            // allKeys.sort(function(a, b) {
-            //   return parseInt(a.slice(4)) - parseInt(b.slice(4));
-            // });
-            // console.log('The keys are ' + allKeys.join(', '));
+      let port1 = chrome.runtime.connect({name: "maximizeWindow"});
+      // Send a message through the port
+      port1.postMessage({action: "maximize"});
+      // Listen for messages from the port
+      port1.onMessage.addListener(function(message) {
+        // Handle the response here
+        if(message.success === true){
+          console.log("maximize window")
+          const warningMsg = document.createElement('div');
+          warningMsg.classList.add('message-box-fail');
+          warningMsg.id = 'capturedArea';
+          warningMsg.style.flexDirection = 'column';
+          warningMsg.style.alignItems = 'center';
+          warningMsg.style.justifyContent = 'center';
+          warningMsg.style.textAlign = 'center';
+          // Create image element
+          const warningImg = document.createElement('img');
+          var warningImgURL = chrome.runtime.getURL("/assets/icons8-warning-48.png");
+          warningImg.src = warningImgURL;
+          warningImg.style.width = '20%';
+          // Create text node
+          const warningText = document.createElement('p');
+          warningText.innerText = "Please maximize your browser window to continue!";
+          warningText.style.fontSize = '80%';
+          warningText.style.marginBottom = '20px';
 
-            // Loop through the keys and get the values
-            for (var key of allKeys) {
-              var value = result[key];
-              // console.log('The value of ' + key + ' is ' + value);
-            }
+          // Append text and image to warningMsg
+          
+          warningMsg.appendChild(warningImg);
+          warningMsg.appendChild(warningText);
 
-            function separateElements(data) {
-              const elementTypes = [];
-              const elementValues = [];
-              const steps = [];
-            
-              for (const item of data) {
-                if (item.startsWith("elementType")) {
-                  elementTypes.push(item);
-                } else if (item.startsWith("elementValue")) {
-                  elementValues.push(item);
-                } else {
-                  steps.push(item);
-                }
-              }
-            
-              return {
-                elementTypes,
-                elementValues,
-                steps,
-              };
-            }
-            
-            const separated = separateElements(allKeys);
-            
-            console.log(parseInt(separated.elementTypes[6].slice(11))); // Output: ["elementType1", "elementType10", ...]
-            // console.log(separated.elementValues); // Output: ["elementValue1", "elementValue10", ...]
-            // console.log(separated.steps);          // Output: ["step1", "step2", ...]
-        
-          });
-
-          const flashDiv = document.createElement('div');
-          flashDiv.classList.add('flash');
-          flashDiv.id = 'capturedArea';
-          flashDiv.style.position = 'fixed';
-          flashDiv.style.width = '1920px';
-          flashDiv.style.height = '1013px';
-          flashDiv.style.backgroundColor = 'white';
-          document.body.appendChild(flashDiv);
-
-          const audioElement = document.createElement('audio');
-          audioElement.id = 'cameraShutterSound';
-          const audioSource = document.createElement('source');
-          audioSource.src = chrome.runtime.getURL('assets/shutterSound.mp3'); 
-          audioSource.type = 'audio/mpeg';
-          audioElement.appendChild(audioSource);
-          document.body.appendChild(audioElement);
-          audioElement.play();
+          document.body.appendChild(warningMsg);
 
           setTimeout(() => {
-            document.body.removeChild(flashDiv);
-          }, 100); 
-
-        });
+            document.body.removeChild(warningMsg);
+          }, 3000); 
+        }
+        else {
+          let port = chrome.runtime.connect({name: "8080"});
+          // Send a message through the port
+          port.postMessage(sendElementAndValue);
+          port.postMessage({action: "getActiveTab"});
+          console.log("Message sent")
+          // Listen for messages from the port
+          port.onMessage.addListener(function(message) {
+            // Handle the response here
+            // console.log("Received response:", message.success);
+            chrome.storage.local.get(null, function (result) {
+              // Use the result object to access the data
+              var allKeys = Object.keys(result);
+              // console.log('The keys are ' + allKeys.join(', '));
+              // allKeys.sort(function(a, b) {
+              //   return parseInt(a.slice(4)) - parseInt(b.slice(4));
+              // });
+              // console.log('The keys are ' + allKeys.join(', '));
+  
+              // Loop through the keys and get the values
+              for (var key of allKeys) {
+                var value = result[key];
+                // console.log('The value of ' + key + ' is ' + value);
+              }
+  
+              function separateElements(data) {
+                const elementTypes = [];
+                const elementValues = [];
+                const steps = [];
+              
+                for (const item of data) {
+                  if (item.startsWith("elementType")) {
+                    elementTypes.push(item);
+                  } else if (item.startsWith("elementValue")) {
+                    elementValues.push(item);
+                  } else {
+                    steps.push(item);
+                  }
+                }
+              
+                return {
+                  elementTypes,
+                  elementValues,
+                  steps,
+                };
+              }
+              
+              const separated = separateElements(allKeys);
+              
+              console.log(parseInt(separated.elementTypes[6].slice(11))); // Output: ["elementType1", "elementType10", ...]
+              // console.log(separated.elementValues); // Output: ["elementValue1", "elementValue10", ...]
+              // console.log(separated.steps);          // Output: ["step1", "step2", ...]
+              
+              const flashDiv = document.createElement('div');
+              flashDiv.classList.add('flash');
+              flashDiv.id = 'capturedArea';
+              flashDiv.style.position = 'fixed';
+              flashDiv.style.top = '0';
+              flashDiv.style.left = '0';
+              flashDiv.style.width = '100%';
+              flashDiv.style.height = '100%';
+              flashDiv.style.backgroundColor = 'white';
+              flashDiv.style.zIndex = '9999';
+              flashDiv.style.opacity = '0.5';
+              document.body.appendChild(flashDiv);
+    
+              setTimeout(() => {
+                document.body.removeChild(flashDiv);
+              }, 100); 
+              
+            });
+  
+  
+            // const audioElement = document.createElement('audio');
+            // audioElement.id = 'cameraShutterSound';
+            // const audioSource = document.createElement('source');
+            // audioSource.src = chrome.runtime.getURL('assets/shutterSound.mp3'); 
+            // audioSource.type = 'audio/mpeg';
+            // audioElement.appendChild(audioSource);
+            // document.body.appendChild(audioElement);
+            // audioElement.play();
+  
+  
+          });
+        }
+      }); 
     }
   }
  
