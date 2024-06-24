@@ -91,6 +91,26 @@ chrome.runtime.onConnect.addListener(function(port) {
     // Listen for messages from the port
     port.onMessage.addListener(async function(message) {
         chrome.storage.local.clear(function() {})
+        port.postMessage({ success: true });
+    });
+  }
+  else if (port.name === "maximizeWindow") {
+    
+    // Listen for messages from the port
+    port.onMessage.addListener(async function(message) {
+      
+      if (message.action === "maximize") {
+        // Check if the current window is maximized
+        chrome.windows.getCurrent((window) => {
+          if (window.state === 'maximized') {
+              console.log('Window is maximized.');
+              port.postMessage({ success: false });
+          } else {
+              console.log('Window is not maximized.');
+              port.postMessage({ success: true });
+          }
+        });
+      }
     });
   }
 });

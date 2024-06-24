@@ -270,6 +270,34 @@
       ;
     }
 
+    #message-box {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px;
+      color: #DC143C;
+      background-color: #FFE5E5;
+      border: 1px solid #DC143C;
+      border-radius: 3px;
+      padding: 5px;
+    }
+
+    #message-box-success {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px;
+      color: #28a745;
+      background-color: #d4edda;
+      border: 1px solid #28a745;
+      border-radius: 3px;
+      padding: 5px;
+    }
+
   </style>
 </head>
 <body>
@@ -291,6 +319,14 @@
         </li>
       </ul>
       <div class="tab-content">
+        <div id="message-box" style="display: none;">
+          <img class="logo" src="/assets/icons8-warning-48.png" width="20%">
+          <p>Please maximize your browser window to continue!</p>
+        </div>
+        <div id="message-box-success" style="display: none;">
+          <img class="logo" src="/assets/icons8-success-48.png" width="20%">
+          <p>Storage cleared successfully.</p>
+        </div>
         <div class="overview active">
           <div class="firstTabContent1">
             <img src="/assets/light.gif" width="80%">

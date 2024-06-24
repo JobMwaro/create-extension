@@ -2,16 +2,39 @@
 popupTabs();
 
 document.getElementById('openNewTab').addEventListener('click', function() {
-  chrome.tabs.create({ url: 'https://www.staging.ursbonline.go.ug/' }, function(tab) {
-    // Inject content script after the tab is created
-    // chrome.tabs.executeScript(tab.id, { file: 'content.js' });
-    chrome.scripting
-    .executeScript({
-      target : {tabId : tab.id, allFrames : true},
-      files : [ "./scripts/content.js" ],
-    })
-    .then(() => console.log("script injected in all frames"));
+  // Get a reference to the message box element
+
+  let port = chrome.runtime.connect({name: "maximizeWindow"});
+  // Send a message through the port
+  port.postMessage({action: "maximize"});
+  // Listen for messages from the port
+  port.onMessage.addListener(function(message) {
+    // Handle the response here
+    if(message.success === true){
+      const messageBox = document.getElementById("message-box");
+
+      messageBox.style.display = 'block'; // Show the message box
+
+      // Hide the message box after 5 seconds
+      setTimeout(function() {
+        messageBox.style.display = 'none';
+      }, 3000); 
+    }
+    else if(message.success === false){
+      chrome.tabs.create({ url: 'https://www.staging.ursbonline.go.ug/' }, function(tab) {
+        // Inject content script after the tab is created
+        // chrome.tabs.executeScript(tab.id, { file: 'content.js' });
+        chrome.scripting
+        .executeScript({
+          target : {tabId : tab.id, allFrames : true},
+          files : [ "./scripts/content.js" ],
+        })
+        .then(() => console.log("script injected in all frames"));
+      });
+    }    
   });
+
+
 });
 
 document.getElementById('stop').addEventListener('click', function() {
@@ -48,8 +71,18 @@ document.getElementById('clearButton').addEventListener('click', function() {
   // Listen for messages from the port
   port.onMessage.addListener(function(message) {
     // Handle the response here
-    console.log("Received response:", message.success);
+    if(message.success === true){
+      const messageBoxSuccess = document.getElementById("message-box-success");
+
+      messageBoxSuccess.style.display = 'block'; // Show the message box
+
+      // Hide the message box after 5 seconds
+      setTimeout(function() {
+        messageBoxSuccess.style.display = 'none';
+      }, 3000); 
+    }   
   });
+  
 });
 
 function popupTabs(){
