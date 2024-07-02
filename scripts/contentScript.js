@@ -57,36 +57,53 @@ function getSrl(){
       var stepContainerAfter = document.createElement('div');
       var stepHeader = document.createElement('div');
       var stepFooter = document.createElement('div');
+      var stepActionButtonsContainer = document.createElement('div');
       var stepImg = document.createElement('img');
+      var deleteButtonIcon = document.createElement('img');
       var stepTitle = document.createElement("h3");
       var stepDescription = document.createElement("span");
+      var stepDeleteButton = document.createElement("button");
       stepContainer.setAttribute("class", "stepContainer");
       stepContainerAfter.setAttribute("class", "stepContainerAfter");
       stepHeader.setAttribute("class", "stepHeader");
       stepFooter.setAttribute("class", "stepFooter");
       stepDescription.setAttribute("class", "stepDescription");
+      stepDeleteButton.setAttribute("class", "stepDeleteButton");
+      stepActionButtonsContainer.setAttribute("class", "stepActionButtonsContainer");
       var stepContainerIdSetter = 'stepContainer'+key;
       var stepHeaderIdSetter = 'stepHeader'+key;
       var stepFooterIdSetter = 'stepFooter'+key;
       var stepDescriptionIdSetter = 'stepDescription'+key;
+      var stepDeleteButtonIdSetter = 'stepDeleteButton'+key;
+      var stepActionButtonsContainerSetter = 'stepActionButtonsContainer'+key;
       stepContainer.id = stepContainerIdSetter;
       stepHeader.id = stepHeaderIdSetter;
       stepFooter.id = stepFooterIdSetter;
       stepDescription.id = stepDescriptionIdSetter;
+      stepDeleteButton.id = stepDeleteButtonIdSetter;
+      stepActionButtonsContainer.id = stepActionButtonsContainerSetter;
       document.body.appendChild(stepContainer);
       document.body.appendChild(stepContainerAfter);
       var stepContainerIdGetter = document.querySelector('#'+stepContainerIdSetter);
       stepContainerIdGetter.appendChild(stepHeader);
       stepContainerIdGetter.appendChild(stepFooter);
+      stepContainerIdGetter.appendChild(stepActionButtonsContainer)
       var stepHeaderIdGetter = document.querySelector('#'+stepHeaderIdSetter);
       var stepFooterIdGetter = document.querySelector('#'+stepFooterIdSetter);
+      var stepActionButtonsContainerIdGetter = document.querySelector('#'+stepActionButtonsContainerSetter);
       stepImg.id = key;
       stepImg.src = value;
       stepImg.style.width = '120%';
+      deleteButtonIcon.src = '/assets/icons8-delete-96-black.png';
+      deleteButtonIcon.style.width = '140%';  
+      stepDeleteButton.insertBefore(deleteButtonIcon, stepDeleteButton.firstChild);
       stepHeaderIdGetter.appendChild(stepImg);
       stepFooterIdGetter.appendChild(stepTitle);
       stepFooterIdGetter.appendChild(stepDescription);
+      stepFooterIdGetter.appendChild(stepDescription);
+      stepActionButtonsContainerIdGetter.appendChild(stepDeleteButton);
       stepTitle.innerHTML = 'Step #'+stepNo;
+      
       // stepDescription.innerHTML = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tempor id turpis in porttitor. Vivamus ex felis, efficitur in sodales sit amet, dapibus efficitur ante. Aliquam eu pretium nibh.";
       
       for (var key1 of separated.elementTypes) {
@@ -302,7 +319,47 @@ function getSrl(){
         });
       }
     });
+
+    parent.addEventListener("click", function(event) {
+      let target = event.target;
+      if (target.classList.contains("stepDescription")) {
+        let input = document.createElement("textarea");
+        input.value = target.textContent;
+        input.id = target.id;
+        input.className = "stepDescriptionEdit";
+        target.replaceWith(input);
+        input.focus();
+        input.cols = 30; // Number of columns
+        input.rows = 5;  // Number of rows
+        input.addEventListener('input', function() {
+          const maxLength =215;
+          if (input.value.length > maxLength) {
+            input.value = input.value.slice(0, maxLength);
+          }
+        });
+        parent.addEventListener("click", function(event) {
+          if (event.target == input) {
+            input.focus();
+          }
+          else {
+            let value = input.value;
+            let newText = document.createElement("span");
+            newText.textContent = value;
+            newText.id = input.id;
+            newText.className = "stepDescription";
+            input.replaceWith(newText);
+          }
+        });
+      }
+    });
     
+    const stepDeleteButtons = document.querySelectorAll(".stepDeleteButton");
+    stepDeleteButtons.forEach((button, index) => {
+      button.addEventListener("click", function() {
+        
+        console.log(this.id);
+      });
+    });
   });
 }
 

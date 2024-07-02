@@ -56,7 +56,7 @@
     
     .stepFooter {
       width: 90%;
-      height: 20%;
+      height: 17%;
       /* border: 1px solid #cccccc; */
       border-radius: 10px;
       /* box-shadow: 2px 2px 5px #cccccc; */
@@ -100,6 +100,39 @@
       font-size: 15px;
       border: 1px solid #cccccc;
     }
+
+    .stepDeleteButton {
+      border: 12px solid #DC143C;
+      border: none;
+      cursor: pointer;
+      direction: ltr;
+      display: flex;
+      justify-content: center; /* Centers content horizontally */
+      align-items: center; /* Centers content vertically */
+      color: #fff; /* Set the text color */
+      width: 30px; /* Make the width equal to the height to form a circle */
+      height: 30px;
+      border-radius: 50%; /* Makes the button round */
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      float: right;
+      margin-bottom: 20px;
+      margin-right: 20px;
+    }
+
+    .stepDeleteButton:hover img {
+      content: url('/assets/icons8-delete-96.png');
+    }
+
+    .stepActionButtonsContainer{
+      /* box-shadow: 2px 2px 5px #cccccc; */
+      align-items: center;
+      padding: 0px 0px 60px 0px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    
 
   </style>
 </head>

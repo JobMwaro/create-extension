@@ -38,20 +38,20 @@ document.getElementById('openNewTab').addEventListener('click', function() {
 });
 
 document.getElementById('stop').addEventListener('click', function() {
-  chrome.tabs.query({}, function(tabs) {
-    // Loop through the tabs
-    for (let tab of tabs) {
-      // Get the tab ID
-      const tabId = tab.id;
-      // Inject the script into the tab
-      chrome.scripting.executeScript({
-        target: { tabId },
-        files : [ "./scripts/undoContent.js" ],
-      })
-      .then(() => console.log("Script injected and executed"))
-      .catch(error => console.error("Error injecting script:", error));
-    }
-  });
+  // chrome.tabs.query({}, function(tabs) {
+  //   // Loop through the tabs
+  //   for (let tab of tabs) {
+  //     // Get the tab ID
+  //     const tabId = tab.id;
+  //     // Inject the script into the tab
+  //     chrome.scripting.executeScript({
+  //       target: { tabId },
+  //       files : [ "./scripts/undoContent.js" ],
+  //     })
+  //     .then(() => console.log("Script injected and executed"))
+  //     .catch(error => console.error("Error injecting script:", error));
+  //   }
+  // });
 
   let port = chrome.runtime.connect({name: "8081"});
   // Send a message through the port

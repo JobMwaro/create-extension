@@ -19,6 +19,7 @@ if (!document.querySelector('.custom-ribbon')) {
   // Add event listener to update ribbon position on mousemove
   document.addEventListener('mousemove', updateRibbonPosition);
   
+  //#region idle buttons
   var img = document.createElement("img");
   var label = document.createTextNode("Stop recording");
   var container = document.createElement('div');
@@ -60,7 +61,7 @@ if (!document.querySelector('.custom-ribbon')) {
 
   container.appendChild(img);
   container.appendChild(label);
-  document.body.appendChild(container);
+  // document.body.appendChild(container);
 
   // Hover state
   container.addEventListener('mouseover', () => {
@@ -81,91 +82,6 @@ if (!document.querySelector('.custom-ribbon')) {
       container.style.boxShadow = 'rgba(131, 192, 253, 0.5) 0 0 0 3px';
       container.style.outline = 'none';
   });
-
-  //#region idle buttons
-  // Create a new div element for the action buttons
-  var actionDiv = document.createElement('div');
-  actionDiv.className = 'action-buttons';
-  actionDiv.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.2)';
-  actionDiv.style.border = '1px solid #000'; // Border style
-  actionDiv.style.background = '#ffff'; // Background color
-  actionDiv.style.color = '#0000';
-  actionDiv.style.borderRadius = '20px';
-  actionDiv.style.width = '40px'; /* Diameter of the circle */
-  actionDiv.style.height = '110px';
-  actionDiv.style.textAlign = 'center';
-  
-
-  // Create three buttons and append them to the action div
-  var button1 = document.createElement('button');
-  // button1.textContent = '1';
-  button1.className = 'inner-button';
-  button1.id = 'button1';
-  imgURL = chrome.runtime.getURL("icons/stop-button.png");
-  var span1 = document.createElement('span');
-  span1.innerHTML = "<img src="+imgURL+" alt='stop'>";
-  button1.appendChild(span1)
-  // button1.innerHTML = "<img src="+imgURL+" alt='stop'>";
-  actionDiv.appendChild(button1);
-
-  var verticalView = document.createElement('br');
-  actionDiv.appendChild(verticalView);
-
-  var button2 = document.createElement('button');
-  // button2.textContent = '2';
-  button2.className = 'inner-button';
-  imgURL1 = chrome.runtime.getURL("icons/check-mark.png");
-  button2.innerHTML = "<img src="+imgURL1+" alt='stop'>";
-  actionDiv.appendChild(button2);
-
-  var verticalView = document.createElement('br');
-  actionDiv.appendChild(verticalView);
-
-  var button3 = document.createElement('button');
-  button3.textContent = '3';
-  button3.className = 'inner-button';
-  actionDiv.appendChild(button3);
-
-  document.body.appendChild(actionDiv);
-
-  // Hide the action div by default
-  actionDiv.style.display = 'none';
-
-  var styleInnerButtons = document.querySelectorAll('.inner-button');
-  styleInnerButtons.forEach(function(button) {
-    button.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.2)';
-    button.style.border = '1px solid #000'; // Border style
-    button.style.background = '#fff'; // Background color
-    button.style.color = '#000';
-    button.style.borderRadius = '50%';
-    button.style.width = '30px'; /* Diameter of the circle */
-    button.style.height = '30px';
-    button.style.bottom = '20px';
-    button.style.margin = '2px 0px 0px 0px';
-    button.style.transition = "transform 0.2s ease-in-out 0s";
-    button.addEventListener('mouseover', function(){
-      button.style.transform = 'scale(1.2)';
-    })
-    button.addEventListener('mouseout', function(){
-      button.style.transform = 'scale(1.0)';
-    })
-  
-  });
-
-    
-  // Create and append the button to the body of the page
-  const button = document.createElement('button');
-  button.innerHTML = 'Create';
-  button.style.position = 'fixed';
-  button.style.bottom = '20px';
-  button.style.right = '20px';
-  button.style.padding = '10px';
-  button.style.borderRadius = '10px';
-  button.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.2)';
-  button.style.border = '1px solid #000'; // Border style
-  button.style.background = '#fff'; // Background color
-  button.style.color = '#000'; // Text color
-  // document.body.appendChild(button);
   //#endregion
 
   // Create a port and store it in a variable
@@ -193,20 +109,6 @@ if (!document.querySelector('.custom-ribbon')) {
         console.log("Received response:", message.success);
       });
     }
-    // if(event.target == container){
-    //   var actionButtons = document.querySelector('.action-buttons');
-    //   var style = window.getComputedStyle(actionButtons);
-    //   if (style.display === 'none') {
-    //     // Show the action div when the mouse is over the container
-    //     actionDiv.style.display = 'block';
-    //     actionDiv.style.position = 'fixed'; // Add this line
-    //     actionDiv.style.bottom = '105px'; // Adjust the top distance as needed
-    //     actionDiv.style.right = '40px'; // Adjust the right distance as needed
-    //   }
-    //   else{
-    //     actionDiv.style.display = 'none';
-    //   }
-    // }
     else{
 
       let port1 = chrome.runtime.connect({name: "maximizeWindow"});
@@ -295,10 +197,13 @@ if (!document.querySelector('.custom-ribbon')) {
               
               const separated = separateElements(allKeys);
               
-              console.log(parseInt(separated.elementTypes[6].slice(11))); // Output: ["elementType1", "elementType10", ...]
+              // console.log(parseInt(separated.elementTypes[6].slice(11))); // Output: ["elementType1", "elementType10", ...]
               // console.log(separated.elementValues); // Output: ["elementValue1", "elementValue10", ...]
               // console.log(separated.steps);          // Output: ["step1", "step2", ...]
-              
+              // console.log(result[separated.elementTypes[9]]);
+              // console.log(result[separated.elementValues[9]]);
+              // console.log(result[separated.steps[9]]);
+
               const flashDiv = document.createElement('div');
               flashDiv.classList.add('flash');
               flashDiv.id = 'capturedArea';
@@ -307,9 +212,11 @@ if (!document.querySelector('.custom-ribbon')) {
               flashDiv.style.left = '0';
               flashDiv.style.width = '100%';
               flashDiv.style.height = '100%';
-              flashDiv.style.backgroundColor = 'white';
-              flashDiv.style.zIndex = '9999';
-              flashDiv.style.opacity = '0.5';
+              flashDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              flashDiv.style.zIndex = '2147483649';
+              // flashDiv.style.opacity = '0.1';
+              flashDiv.style.border = '3px solid purple';
+              // flashDiv.style.borderRight = '3px solid purple';
               document.body.appendChild(flashDiv);
     
               setTimeout(() => {
