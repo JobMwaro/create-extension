@@ -1,47 +1,131 @@
-.custom-ribbon {
-  position: absolute;
-  pointer-events: none;
-  width: 70px; /* Diameter of the circle */
-  height: 70px; /* Diameter of the circle */
-  border-radius: 50%; /* Makes the shape circular */
-  background-color: rgba(128, 0, 128, 0.1); /* Transparent purple color */
-  transform: translate(-50%, -50%); /* Center the circle around the pointer */
-  border: 2px solid purple; /* Change border properties as needed */
-  z-index: 10000;
+/*
+ * All recorder-injected UI lives under .create-ext-* class names so host-page
+ * stylesheets cannot collide with us. Every rule uses !important because we
+ * are guests on arbitrary websites and need to win specificity battles
+ * regardless of what the host page declares.
+ */
+
+.create-ext-ribbon {
+  position: absolute !important;
+  pointer-events: none !important;
+  width: 70px !important;
+  height: 70px !important;
+  border-radius: 50% !important;
+  background-color: rgba(128, 0, 128, 0.1) !important;
+  transform: translate(-50%, -50%) !important;
+  border: 2px solid purple !important;
+  z-index: 2147483646 !important;
 }
 
-/* Add a CSS class for the flash effect */
-.button-container {
-  animation: pulse 1s infinite ease-in-out;
+/* Cursor pointer SVG centered on the click point (the ribbon's centre).
+   The cursor's tip is at viewBox (3,2), so we offset the SVG so that
+   point lines up with the ribbon centre. */
+.create-ext-ribbon-cursor {
+  position: absolute !important;
+  left: 50% !important;
+  top:  50% !important;
+  /* Tip lives ~3px from the SVG's left edge and ~2px from the top, so
+     shift the SVG so the tip lands on (50%, 50%) of the ribbon. */
+  margin-left: -3px !important;
+  margin-top:  -2px !important;
+  pointer-events: none !important;
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35)) !important;
 }
 
-@keyframes pulse {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+.create-ext-stop {
+  all: initial;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 2147483647 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  border-radius: 999px !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  border: none !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+  transition: background 0.15s ease, transform 0.1s ease !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
-.message-box-fail {
-  display: flex; /* Use flexbox for centering content*/
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 25%;
-  height: 20%;
-  z-index: 9999; /*High z-index value to appear above all other content*/
-  transform: translate(-50%, -50%);
-  color: #DC143C;
-  background-color: #FFE5E5;
-  border: 1px solid #DC143C;
-  border-radius: 3px;
-  padding: 10px 10px ;
+.create-ext-stop:hover {
+  background: #dc2626 !important;
+}
+
+.create-ext-stop:active {
+  transform: scale(0.97) !important;
+}
+
+.create-ext-stop:focus-visible {
+  outline: 2px solid #fca5a5 !important;
+  outline-offset: 2px !important;
+}
+
+.create-ext-stop::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  animation: create-ext-pulse 1.2s ease-in-out infinite !important;
+}
+
+@keyframes create-ext-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.7); }
+}
+
+.create-ext-flash {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  z-index: 2147483645 !important;
+  border: 3px solid purple !important;
+  pointer-events: none !important;
+}
+
+.create-ext-warning {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 280px !important;
+  max-width: 90vw !important;
+  z-index: 2147483647 !important;
+  background-color: #FFE5E5 !important;
+  color: #DC143C !important;
+  border: 1px solid #DC143C !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 14px !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 10px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.create-ext-warning img {
+  width: 32px !important;
+  height: auto !important;
+}
+
+.create-ext-warning p {
+  margin: 0 !important;
 }

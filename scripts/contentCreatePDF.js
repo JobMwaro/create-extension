@@ -1,262 +1,404 @@
+// PDF export — emits the manual in the OBRS template:
+//   - Cover page (title, subtitle, tagline, organization, portal name, URL, version)
+//   - Body page(s): section title, intro, numbered steps with screenshots and figure captions
+//   - Header (page 2+): right-aligned, italic, gray
+//   - Footer: center, gray, "Organization · Page X of Y"
+//
+// Uses jsPDF (loaded as window.jspdf.jsPDF).
 
+(function () {
+  const A4 = { width: 210, height: 297 };           // mm
+  const MARGIN = { top: 22, right: 18, bottom: 22, left: 18 };
+  const CONTENT_W = A4.width - MARGIN.left - MARGIN.right;
 
+  // Colors from the OBRS template
+  const COLOR_TITLE     = '#0C3461';
+  const COLOR_SUBTITLE  = '#4472C4';
+  const COLOR_TAGLINE   = '#555555';
+  const COLOR_URL       = '#0066CC';
+  const COLOR_MUTED     = '#888888';
+  const COLOR_BODY      = '#111111';
 
- // Create and append the button to the body of the page
- const button = document.createElement('button');
- button.innerHTML = 'Generate';
- button.style.position = 'fixed';
- button.style.bottom = '75px';
- button.style.right = '40px';
-//  button.style.padding = '5px';
-//  button.style.borderRadius = '15px';
-//  button.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.2)';
-//  button.style.border = '1px solid #000'; // Border style
-//  button.style.background = '#fff'; // Background color
-//  button.style.color = '#000'; // Text color
- button.style.width = '100px';
-//  button.style.textAlign = 'center';
-//  document.body.appendChild(button);
-
- button.style.backgroundImage = 'linear-gradient(#42A1EC, #0070C9)';
-  button.style.border = '1px solid #0077CC';
-  button.style.borderRadius = '4px';
-  button.style.boxSizing = 'border-box';
-  button.style.color = '#FFFFFF';
-  button.style.cursor = 'pointer';
-  button.style.direction = 'ltr';
-  button.style.display = 'block';
-  button.style.fontFamily = '"SF Pro Text", "SF Pro Icons", "AOS Icons", "Helvetica Neue", Helvetica, Arial, sans-serif';
-  button.style.fontSize = '14px';
-  button.style.fontWeight = '400';
-  button.style.height = '29px';
-  button.style.letterSpacing = '-.022em';
-  button.style.lineHeight = '1.47059';
-  button.style.minWidth = '30px';
-  button.style.overflow = 'visible';
-  button.style.padding = '4px 15px';
-  button.style.textAlign = 'center';
-  button.style.userSelect = 'none';
-  button.style.webkitUserSelect = 'none';
-  button.style.touchAction = 'manipulation';
-  button.style.whiteSpace = 'nowrap';
-  document.body.appendChild(button);
-
-  // Hover state
-  button.addEventListener('mouseover', () => {
-      button.style.backgroundImage = 'linear-gradient(#51A9EE, #147BCD)';
-      button.style.borderColor = '#1482D0';
-      button.style.textDecoration = 'none';
-  });
-
-  // Active state
-  button.addEventListener('mousedown', () => {
-      button.style.backgroundImage = 'linear-gradient(#3D94D9, #0067B9)';
-      button.style.borderColor = '#006DBC';
-      button.style.outline = 'none';
-  });
-
-  // Focus state
-  button.addEventListener('focus', () => {
-      button.style.boxShadow = 'rgba(131, 192, 253, 0.5) 0 0 0 3px';
-      button.style.outline = 'none';
-  });
-
-  // Blur state
-  button.addEventListener('blur', () => {
-      button.style.boxShadow = '';
-  });
-
- button.addEventListener('click', function(){
-  console.log("Button Clicked")
-  chrome.storage.local.get(null, function(result) {
-    var allKeys = Object.keys(result);
-
-    function separateElements(data) {
-      const elementTypes = [];
-      const elementValues = [];
-      const steps = [];
-    
-      for (const item of data) {
-        if (item.startsWith("elementType")) {
-          elementTypes.push(item);
-        } else if (item.startsWith("elementValue")) {
-          elementValues.push(item);
-        } else {
-          steps.push(item);
-        }
-      }
-    
-      return {
-        elementTypes,
-        elementValues,
-        steps,
-      };
-    }
-    
-    const separated = separateElements(allKeys);
-    // console.log(separated.elementTypes); // Output: ["elementType1", "elementType10", ...]
-    // console.log(separated.elementValues); // Output: ["elementValue1", "elementValue10", ...]
-    // console.log(separated.steps);          // Output: ["step1", "step2", ...]
-
-    separated.steps.sort(function(a, b) {
-      return parseInt(a.slice(4)) - parseInt(b.slice(4));
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload  = () => resolve(img);
+      img.onerror = () => reject(new Error('Image failed to load'));
+      img.src = src;
     });
+  }
 
-    // allKeys.sort(function(a, b) {
-    //   return parseInt(a.slice(4)) - parseInt(b.slice(4));
-    // });
+  function setText(doc, text, opts) {
+    doc.setFont('helvetica', opts.bold ? 'bold' : (opts.italic ? 'italic' : 'normal'));
+    doc.setFontSize(opts.size);
+    doc.setTextColor(opts.color || COLOR_BODY);
+    const align = opts.align || 'left';
+    const x = align === 'center'
+      ? A4.width / 2
+      : (align === 'right' ? A4.width - MARGIN.right : MARGIN.left);
+    doc.text(text, x, opts.y, { align, maxWidth: CONTENT_W });
+  }
 
-    var doc = new window.jspdf.jsPDF('p', 'mm', 'a4'); // Access jsPDF from the window object
-    var imagesLoaded = 0; // Counter to track loaded images
-    var imagesAdded = 0;
-    var autoAdjustImg = 0;
-
-    
-    // Get page dimensions
-    var pageSize = doc.internal.pageSize;
-    var pageWidth = pageSize.getWidth();
-    let userGuideTitleContentIdGetter = document.getElementById('userGuideTitleContent');
-    let userGuideTitleContentValue = userGuideTitleContentIdGetter.innerHTML;
-    let headingText = userGuideTitleContentValue;
-    var fontSize = 25;
+  function wrapText(doc, text, fontSize, maxWidth) {
     doc.setFontSize(fontSize);
+    return doc.splitTextToSize(text, maxWidth);
+  }
+
+  function drawCoverPage(doc, meta) {
+    let y = 70;
+    setText(doc, meta.title || '',        { y, size: 28, bold: true, color: COLOR_TITLE,    align: 'center' });
+    y += 14;
+    setText(doc, meta.subtitle || '',     { y, size: 20, bold: true, color: COLOR_SUBTITLE, align: 'center' });
+    y += 10;
+    setText(doc, meta.tagline || '',      { y, size: 12,             color: COLOR_TAGLINE,  align: 'center' });
+    y += 40;
+    setText(doc, meta.organization || '', { y, size: 13, bold: true,                        align: 'center' });
+    y += 7;
+    setText(doc, meta.portalName || '',   { y, size: 12,                                    align: 'center' });
+    y += 6;
+    if (meta.url) {
+      setText(doc, meta.url, { y, size: 12, color: COLOR_URL, align: 'center' });
+      y += 8;
+    }
+    setText(doc, meta.version || '', { y, size: 12, color: COLOR_TAGLINE, align: 'center' });
+  }
+
+  // Reserve room at the top/bottom for header + footer once drawn.
+  function drawHeader(doc, meta) {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(COLOR_MUTED);
+    const headerText = [meta.title, meta.subtitle].filter(Boolean).join(' · ');
+    doc.text(headerText, A4.width - MARGIN.right, 12, { align: 'right' });
+  }
+
+  function drawFooter(doc, meta, page, totalPages) {
     doc.setFont('helvetica', 'normal');
-    // Get text width
-    var headingTextWidth = doc.getTextDimensions(headingText).w;
-    // Calculate center position for horizontal alignment
-    var headingTextX = (pageWidth - headingTextWidth) / 2;
-    let lineWidth = 40; 
-    let lines = headingText.split(/\s+/).reduce((lines, word) => {
-      if (lines[lines.length - 1].length + word.length > lineWidth) {
-          lines.push("");
+    doc.setFontSize(9);
+    doc.setTextColor(COLOR_MUTED);
+    const left = meta.organization ? meta.organization.split('(')[0].trim() : '';
+    const text = `${left ? left + ' · ' : ''}Page ${page} of ${totalPages}`;
+    doc.text(text, A4.width / 2, A4.height - 10, { align: 'center' });
+  }
+
+  function newBodyPage(doc) {
+    doc.addPage();
+    return MARGIN.top;
+  }
+
+  function ensureSpace(doc, y, needed) {
+    if (y + needed > A4.height - MARGIN.bottom) return newBodyPage(doc);
+    return y;
+  }
+
+  async function drawBody(doc, renderSections, compiled) {
+    let y = MARGIN.top;
+    let firstSection = true;
+    for (const section of renderSections) {
+      if (!firstSection) {
+        // Start each new section on a fresh page — matches the OBRS layout
+        // where each chapter begins on its own page.
+        y = newBodyPage(doc);
       }
-      lines[lines.length - 1] += word + " ";
-      return lines;
-    }, [""]);
-    let y = 20;
-    lines.forEach(line => {
-        let textWidth = doc.getTextDimensions(line).w // Calculate text width
-        let x = (pageWidth - textWidth) / 2; // Center horizontally
-        doc.text(line, x, y);
-        y += 10; 
-    });
+      firstSection = false;
+      const stepsInSection = section.id == null
+        ? compiled.filter(s => !s.sectionId)
+        : compiled.filter(s => s.sectionId === section.id);
+      y = await drawSection(doc, section, stepsInSection, y);
+    }
+  }
 
-    function addImageToPDF(value, key){
-      // Create an Image object to get the actual image dimensions
-      var img = new Image();
-      img.onload = function () {
-        var imgWidth = 170; // Width of the image in the PDF
-        var imgHeight = (img.height * imgWidth) / img.width; // Maintain aspect ratio
+  async function drawSection(doc, section, steps, startY) {
+    let y = startY;
 
-        var availableSpace = doc.internal.pageSize.height - (30 + imagesAdded * 122 + imgHeight); // Calculate available space
-        
-        if (availableSpace < 0 && imagesAdded > 0) {
-          doc.addPage(); // Move to a new page
-          imagesAdded = 0; // Reset image counter for new page
-        }
+    // H1 section title (large bold navy)
+    if (section.title) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.setTextColor(COLOR_TITLE);
+      const lines = wrapText(doc, section.title, 20, CONTENT_W);
+      for (const line of lines) {
+        y = ensureSpace(doc, y, 10);
+        doc.text(line, MARGIN.left, y);
+        y += 9;
+      }
+      y += 2;
+    }
 
-        // Add the image to the PDF
-        var imgX = (pageWidth - imgWidth) / 2;
-        if(autoAdjustImg === 0){
-          doc.addImage(value, 'PNG', imgX, 33 + imagesAdded * 122, imgWidth, imgHeight);
-          console.log('Auto adjust Image position1 '+autoAdjustImg)
-        }
-        else if(autoAdjustImg !== 0 && imagesAdded === 0){
-          doc.addImage(value, 'PNG', imgX, 33 + imagesAdded * 122, imgWidth, imgHeight);
-          console.log('Auto adjust Image position1 '+autoAdjustImg)
-        }
-        else{
-          doc.addImage(value, 'PNG', imgX, autoAdjustImg + 11 + imagesAdded * 122, imgWidth, imgHeight);
-          console.log('Auto adjust Image position '+autoAdjustImg)
-        }
-        
-        //Add step
-        stepNumberText = 'Step #'+parseInt(key.slice(4));
-        // Set font size and type
-        var fontSize = 18;
-        doc.setFontSize(fontSize);
-        doc.setFont('helvetica', 'bold');
+    // Intro
+    if (section.intro) {
+      const lines = wrapText(doc, section.intro, 11, CONTENT_W);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(COLOR_BODY);
+      for (const line of lines) {
+        y = ensureSpace(doc, y, 6);
+        doc.text(line, MARGIN.left, y);
+        y += 5.5;
+      }
+      y += 4;
+    }
 
-        // Get text width
-        var textWidth = doc.getTextDimensions(stepNumberText).w;
+    if (section.purpose) {
+      y = drawMetaBlock(doc, 'Purpose', section.purpose, y);
+    }
+    if (section.prerequisites) {
+      y = drawBulletedMetaBlock(doc, 'Prerequisites', section.prerequisites, y);
+    }
 
-        // Calculate center position for horizontal alignment
-        var textX = (pageWidth - textWidth) / 2;
-        doc.setTextColor("#8A2BE2");
+    // Steps within this section — numbering restarts at 1
+    let prevStep = null;
+    let manualOrdinal = 0;
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
 
-        if(autoAdjustImg === 0){
-          doc.text(stepNumberText,textX, 129 + imagesAdded * 122);
-          console.log('First step text');
-        }
-        else if(autoAdjustImg !== 0 && imagesAdded === 0){
-          doc.text(stepNumberText,textX, 129 + imagesAdded * 122);
-        }
-        else{
-          doc.text(stepNumberText,textX, autoAdjustImg + 109 + imagesAdded * 122);
-        }
-        
-
-        let stepDescriptionIdSetter = 'stepDescription'+key;
-        let stepDescriptionIdGetter = document.getElementById(stepDescriptionIdSetter);
-        let stepDescriptionIdValue = stepDescriptionIdGetter.innerHTML;
-        let stepDescriptionText = stepDescriptionIdValue;
-        // Set font size and type
-        var fontSize = 14;
-        doc.setFontSize(fontSize);
+      // Narrative blocks: pass through as a plain prose paragraph
+      if (step.kind === 'narrative') {
+        const text = (step.description || '').trim();
+        if (!text) continue;
+        const lines = wrapText(doc, text, 11, CONTENT_W);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor("#000000");
-        const lineWidth = 75; // Adjust as needed
-        const lines = stepDescriptionText.split(/\s+/).reduce((lines, word) => {
-          if (lines[lines.length - 1].length + word.length > lineWidth) {
-              lines.push("");
+        doc.setFontSize(11);
+        doc.setTextColor(COLOR_BODY);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 6);
+          doc.text(line, MARGIN.left, y);
+          y += 5.5;
+        }
+        y += 4;
+        prevStep = step;
+        continue;
+      }
+
+      manualOrdinal += 1;
+      const ordinal = manualOrdinal;
+      const description = step.description && step.description.length > 0
+        ? step.description
+        : StepsRepo.describeStep(step);
+      const numberedText = `${ordinal}. ${description}`;
+      const numberedLines = wrapText(doc, numberedText, 11, CONTENT_W);
+
+      // Estimate height for the whole step block so we can avoid splitting
+      // the screenshot from its number when possible.
+      let img;
+      try { img = await loadImage(step.image); } catch (e) { img = null; }
+      const imgPlannedW = img ? Math.min(CONTENT_W, 150) : 0;
+      const imgPlannedH = img ? imgPlannedW * (img.height / img.width) : 0;
+
+      const blockH = numberedLines.length * 5.5 + 4 + imgPlannedH + 8 + 5;
+      if (y + blockH > A4.height - MARGIN.bottom && y > MARGIN.top) {
+        y = newBodyPage(doc);
+      }
+
+      // Numbered description
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(COLOR_BODY);
+      for (const line of numberedLines) {
+        y = ensureSpace(doc, y, 6);
+        doc.text(line, MARGIN.left, y);
+        y += 5.5;
+      }
+
+      // Context extras (Tabs / Filters / Status counters / freeform)
+      const extras = StepsRepo.visibleExtras(step, prevStep);
+      if (extras.length > 0) {
+        y += 1;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(COLOR_BODY);
+        for (const extra of extras) {
+          const extraLines = wrapText(doc, extra, 11, CONTENT_W - 6);
+          for (const line of extraLines) {
+            y = ensureSpace(doc, y, 6);
+            doc.text(line, MARGIN.left + 6, y);
+            y += 5.2;
           }
-          lines[lines.length - 1] += word + " ";
-          return lines;
-        }, [""]);
-        let y = 0;
-        if(autoAdjustImg === 0){
-          y = 137 + imagesAdded * 122;
         }
-        else if(autoAdjustImg !== 0 && imagesAdded === 0){
-          y = 137 + imagesAdded * 122;
-        }
-        else{
-          y = autoAdjustImg + 117 + imagesAdded * 122;
-          autoAdjustImg = 0;
-        }
+      }
+      y += 3;
 
-        const pageWidth1 = doc.internal.pageSize.getWidth(); // Get actual page width
-        var numberOfLines = 1;
-        var textHeight =1;
-        lines.forEach(line => {
-            const textWidth = doc.getTextDimensions(line).w // Calculate text width
-            textHeight = doc.getTextDimensions(line).h;
-            const x = (pageWidth1 - textWidth) / 2; // Center horizontally
-            doc.text(line, x, y);
-            y += 6; 
-            numberOfLines += 1;
-        });
-        autoAdjustImg = numberOfLines * textHeight;
-        imagesLoaded++;
-        imagesAdded++;
-        // Check if all images are loaded and then save the PDF
-        if(imagesLoaded === separated.steps.length){
-          // Save the PDF
-          doc.save('create_user_guide.pdf');
+      // Screenshot — the click marker (purple ribbon + cursor pointer) is
+      // already baked into the captured image at click time.
+      if (img) {
+        const imgW = imgPlannedW;
+        const imgH = imgPlannedH;
+        y = ensureSpace(doc, y, imgH + 8);
+        const x = MARGIN.left + (CONTENT_W - imgW) / 2;
+        doc.addImage(step.image, 'PNG', x, y, imgW, imgH);
+        y += imgH + 3;
+      }
+
+      // Caption
+      const caption = step.caption && step.caption.length > 0
+        ? step.caption
+        : StepsRepo.defaultCaption(step);
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(10);
+      doc.setTextColor(COLOR_TAGLINE);
+      const captionLines = wrapText(doc, caption, 10, CONTENT_W);
+      for (const line of captionLines) {
+        y = ensureSpace(doc, y, 5);
+        doc.text(line, A4.width / 2, y, { align: 'center' });
+        y += 4.5;
+      }
+
+      // Result line (toast / validation text observed after the action)
+      if (step.result && step.result.trim().length > 0) {
+        const resultText = `→ Result: ${step.result.trim()}`;
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(10);
+        doc.setTextColor(31, 95, 198); // #1F5FC6
+        const lines = wrapText(doc, resultText, 10, CONTENT_W - 12);
+        for (const line of lines) {
+          y = ensureSpace(doc, y, 5);
+          doc.text(line, A4.width / 2, y, { align: 'center' });
+          y += 4.5;
         }
-      };
-      img.src = value; // Set the source of the image object
+        y += 1;
+      }
+
+      // Note callout — rounded card with light-gold outline + thicker gold
+      // left rule, matching the editor design.
+      if (step.note && step.note.trim().length > 0) {
+        y += 4;
+        const noteText = step.note.trim();
+        const padX = 4;
+        const padY = 4;
+        const innerW = CONTENT_W - 12;
+        const radius = 1.5;          // ~6px equivalent — modern, subtle
+        const labelW = doc.getTextDimensions('Note: ', { fontSize: 11 }).w + 2;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        const bodyLines = doc.splitTextToSize(noteText, innerW - labelW - padX * 2 - 3);
+        const blockH = padY * 2 + bodyLines.length * 5.5;
+        y = ensureSpace(doc, y, blockH + 4);
+
+        // Background fill + light-gold outline (drawn together with style 'FD')
+        doc.setFillColor(255, 248, 225);     // #FFF8E1
+        doc.setDrawColor(245, 229, 168);     // #F5E5A8
+        doc.setLineWidth(0.25);              // ~0.7pt outline (slimmer)
+        doc.roundedRect(MARGIN.left + 6, y, innerW, blockH, radius, radius, 'FD');
+
+        // Gold left rule — clipped to the rounded silhouette so its outer
+        // corners curve with the card while the right edge stays flat.
+        doc.saveGraphicsState();
+        doc.roundedRect(MARGIN.left + 6, y, innerW, blockH, radius, radius);
+        doc.clip();
+        doc.discardPath();
+        doc.setFillColor(245, 180, 0);       // #F5B400
+        doc.rect(MARGIN.left + 6, y, 1.4, blockH, 'F');
+        doc.restoreGraphicsState();
+
+        // "Note:" label (bold)
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(74, 58, 6);         // #4A3A06
+        const textBaseY = y + padY + 4;
+        const textStartX = MARGIN.left + 6 + padX + 3; // past the gold rule
+        doc.text('Note:', textStartX, textBaseY);
+        // Body (regular)
+        doc.setFont('helvetica', 'normal');
+        let bodyY = textBaseY;
+        for (const line of bodyLines) {
+          doc.text(line, textStartX + labelW, bodyY);
+          bodyY += 5.5;
+        }
+        y += blockH + 9; // breathing room before the next step
+      } else {
+        y += 4;
+      }
+
+      prevStep = step;
     }
 
-    for (var key of separated.steps) {
-      var value = result[key];
-      console.log('The value is ' + value);
-      addImageToPDF(value, key);
+    if (section.expectedOutcome) {
+      y += 2;
+      y = drawMetaBlock(doc, 'Expected outcome', section.expectedOutcome, y);
     }
-  });
+    return y;
+  }
 
- })
+  function drawMetaBlock(doc, label, body, y) {
+    y = ensureSpace(doc, y, 16);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(COLOR_BODY);
+    doc.text(`${label}:`, MARGIN.left, y);
+    y += 5.5;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(COLOR_BODY);
+    const lines = wrapText(doc, body, 11, CONTENT_W - 6);
+    for (const line of lines) {
+      y = ensureSpace(doc, y, 6);
+      doc.text(line, MARGIN.left + 6, y);
+      y += 5.2;
+    }
+    return y + 4;
+  }
 
+  function drawBulletedMetaBlock(doc, label, body, y) {
+    y = ensureSpace(doc, y, 16);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(COLOR_BODY);
+    doc.text(`${label}:`, MARGIN.left, y);
+    y += 5.5;
+    doc.setFont('helvetica', 'normal');
+    const items = String(body).split(/\r?\n/).map(s => s.replace(/^\s*[•\-\*]\s*/, '').trim()).filter(Boolean);
+    for (const item of items) {
+      const lines = wrapText(doc, item, 11, CONTENT_W - 12);
+      lines.forEach((line, idx) => {
+        y = ensureSpace(doc, y, 6);
+        if (idx === 0) doc.text('•', MARGIN.left + 6, y);
+        doc.text(line, MARGIN.left + 12, y);
+        y += 5.2;
+      });
+    }
+    return y + 4;
+  }
 
+  async function exportPdf() {
+    const [meta, raw, sections] = await Promise.all([
+      StepsRepo.getMeta(),
+      StepsRepo.listSteps(),
+      StepsRepo.listSections(),
+    ]);
+    const compiled = StepsRepo.compileSteps(raw);
+    const doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
 
+    // Page 1: cover (no header/footer)
+    drawCoverPage(doc, meta);
 
+    const renderSections = sections.length > 0
+      ? sections
+      : [{
+          id: null,
+          title:           meta.sectionTitle,
+          intro:           meta.intro,
+          purpose:         meta.purpose,
+          prerequisites:   meta.prerequisites,
+          expectedOutcome: meta.expectedOutcome,
+        }];
+
+    const hasAnyBodyContent = compiled.length > 0
+      || renderSections.some(s => s.title || s.intro || s.purpose || s.prerequisites || s.expectedOutcome);
+
+    if (hasAnyBodyContent) {
+      doc.addPage();
+      await drawBody(doc, renderSections, compiled);
+    }
+
+    // Header/footer pass (skip cover page)
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 2; p <= totalPages; p++) {
+      doc.setPage(p);
+      drawHeader(doc, meta);
+      drawFooter(doc, meta, p - 1, totalPages - 1);
+    }
+
+    const safeName = (meta.title || 'user-manual').replace(/[^a-z0-9_\- ]+/gi, '').trim().replace(/\s+/g, '_') || 'user-manual';
+    doc.save(`${safeName}.pdf`);
+  }
+
+  window.CreateExtPdf = { export: exportPdf };
+})();
